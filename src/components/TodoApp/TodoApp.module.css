@@ -1,0 +1,90 @@
+.container {
+  max-width: 550px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2),
+              0 25px 50px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 100px;
+  font-weight: 100;
+  color: rgba(175, 47, 47, 0.15);
+  margin: 0;
+  line-height: 1;
+  text-rendering: optimizeLegibility;
+}
+
+.main {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid #e6e6e6;
+}
+
+.footer {
+  color: #777;
+  padding: 10px 15px;
+  height: 20px;
+  text-align: center;
+  border-top: 1px solid #e6e6e6;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 50px;
+  overflow: hidden;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+              0 8px 0 -3px #f6f6f6,
+              0 9px 1px -3px rgba(0, 0, 0, 0.2),
+              0 16px 0 -6px #f6f6f6,
+              0 17px 2px -6px rgba(0, 0, 0, 0.2);
+}
+
+.todoCount {
+  text-align: left;
+  font-size: 14px;
+}
+
+.clearCompleted {
+  position: relative;
+  line-height: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 14px;
+}
+
+.clearCompleted:hover {
+  text-decoration: underline;
+}
+
+.clearCompleted:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.empty {
+  text-align: center;
+  color: #ccc;
+  font-style: italic;
+  padding: 40px 0;
+  font-size: 16px;
+}
