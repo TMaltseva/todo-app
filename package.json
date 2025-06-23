@@ -2,7 +2,7 @@
   "name": "to-do-app",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://TMaltseva.github.io/to-do-app",
+  "homepage": "https://tmaltseva.github.io/todo-app",
   "scripts": {
     "predeploy": "npm run build",
     "start": "react-scripts start",
