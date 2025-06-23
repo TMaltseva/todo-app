@@ -1,6 +1,6 @@
 import { Todo } from '@/types';
 
-const STORAGE_KEY = 'todos';
+const STORAGE_KEY = 'todos-app-v2';
 
 interface StoredTodo {
   id: string;
@@ -40,7 +40,8 @@ export const loadTodos = (): Todo[] => {
           ...todo,
           createdAt: new Date(todo.createdAt)
         })
-      );
+      )
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   } catch (error) {
     console.error('Failed to load todos from localStorage:', error);
 
@@ -50,12 +51,16 @@ export const loadTodos = (): Todo[] => {
 
 export const saveTodos = (todos: Todo[]): void => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    const todosToStore = todos.map((todo) => ({
+      ...todo,
+      createdAt: todo.createdAt.toISOString()
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todosToStore));
   } catch (error) {
     console.error('Failed to save todos to localStorage:', error);
   }
 };
 
 export const generateId = (): string => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
 };
