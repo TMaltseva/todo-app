@@ -40,54 +40,63 @@ export const useTodos = () => {
         return;
       }
 
-      const newTodo: Todo = {
-        id: generateId(),
-        text: text.trim(),
-        completed: false,
-        createdAt: new Date()
-      };
-
-      setTodos((prev) => [newTodo, ...prev]);
-      setError(null);
-
       try {
-        saveTodos([newTodo, ...todos]);
+        const newTodo: Todo = {
+          id: generateId(),
+          text: text.trim(),
+          completed: false,
+          createdAt: new Date()
+        };
+
+        const updatedTodos = [newTodo, ...todos];
+        saveTodos(updatedTodos);
+        setTodos(updatedTodos);
+        setError(null);
       } catch (err) {
-        setTodos((prev) => prev.filter((todo) => todo.id !== newTodo.id));
         setError('Failed to add task. Please try again.');
       }
     },
     [todos]
   );
 
-  const toggleTodo = useCallback((id: string) => {
-    try {
-      setTodos((prev) =>
-        prev.map((todo) =>
+  const toggleTodo = useCallback(
+    (id: string) => {
+      try {
+        const updatedTodos = todos.map((todo) =>
           todo.id === id ? { ...todo, completed: !todo.completed } : todo
-        )
-      );
-      setError(null);
-    } catch (err) {
-      setError('Failed to update task. Please try again.');
-    }
-  }, []);
+        );
+        saveTodos(updatedTodos);
+        setTodos(updatedTodos);
+        setError(null);
+      } catch (err) {
+        setError('Failed to update task. Please try again.');
+      }
+    },
+    [todos]
+  );
 
-  const deleteTodo = useCallback((id: string) => {
-    try {
-      setTodos((prev) => prev.filter((todo) => todo.id !== id));
-      setError(null);
-    } catch (err) {
-      setError('Failed to delete task. Please try again.');
-    }
-  }, []);
+  const deleteTodo = useCallback(
+    (id: string) => {
+      try {
+        const newTodos = todos.filter((todo) => todo.id !== id);
+        saveTodos(newTodos);
+        setTodos(newTodos);
+        setError(null);
+      } catch (err) {
+        setError('Failed to delete task. Please try again.');
+      }
+    },
+    [todos]
+  );
 
   const clearCompleted = useCallback(() => {
-    try {
-      const completedCount = todos.filter((todo) => todo.completed).length;
-      if (completedCount === 0) return;
+    const completedCount = todos.filter((todo) => todo.completed).length;
+    if (completedCount === 0) return;
 
-      setTodos((prev) => prev.filter((todo) => !todo.completed));
+    try {
+      const updatedTodos = todos.filter((todo) => !todo.completed);
+      saveTodos(updatedTodos);
+      setTodos(updatedTodos);
       setError(null);
     } catch (err) {
       setError('Failed to clear completed tasks. Please try again.');
