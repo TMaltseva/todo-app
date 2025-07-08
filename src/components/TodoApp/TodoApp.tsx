@@ -10,11 +10,14 @@ export const TodoApp: React.FC = () => {
     todos,
     filter,
     stats,
+    isLoading,
+    error,
     addTodo,
     toggleTodo,
     deleteTodo,
     clearCompleted,
-    setFilter
+    setFilter,
+    clearError
   } = useTodos();
 
   const hasCompleted = stats.completed > 0;
@@ -26,7 +29,18 @@ export const TodoApp: React.FC = () => {
         <h1 className={styles.title}>todos</h1>
       </header>
 
+      {error && (
+        <div className={styles.errorBanner} role="alert">
+          {error}
+          <button onClick={clearError} className={styles.closeError}>
+            ×
+          </button>
+        </div>
+      )}
+
       <TodoInput onAddTodo={addTodo} />
+
+      {isLoading && <div className={styles.loading}>Loading your tasks...</div>}
 
       {hasTodos && (
         <>
