@@ -34,13 +34,16 @@
   font-family: inherit;
   font-weight: inherit;
   line-height: 1.4em;
-  border: 0;
-  color: #333;
-  padding: 20px 20px 20px 60px;
-  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  padding: 16px 60px 16px 16px;
+  background: rgba(0, 0, 0, 0.003);
+  box-shadow: inset 0 -2px 1px rgba(0, 0, 0, 0.03);
   box-sizing: border-box;
   transition: all 0.2s ease;
 }
+
 
 @media (max-width: 400px) {
   .input {
@@ -72,17 +75,8 @@
   color: #999;
 }
 
-.inputContainer::before {
-  content: '+';
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 24px;
-  color: #ccc;
-  font-weight: 300;
-  transition: all 0.2s ease;
-  z-index: 1;
+.input:not(:placeholder-shown) {
+  background: rgba(175, 47, 47, 0.02);
 }
 
 @media (max-width: 400px) {
@@ -148,32 +142,6 @@
   border-left-color: #f39c12 !important;
 }
 
-.loadingIndicator {
-  position: absolute;
-  top: 50%;
-  right: 20px;
-  transform: translateY(-50%);
-  color: #666;
-  font-size: 12px;
-  animation: pulse 1s infinite;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-@media (max-width: 400px) {
-  .loadingIndicator {
-    right: 16px;
-    font-size: 11px;
-    padding: 1px 4px;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
 .inputHint {
   position: absolute;
   bottom: -55px;
@@ -225,4 +193,88 @@
   box-shadow: 
     0 6px 8px -1px rgba(0, 0, 0, 0.1),
     0 3px 5px -1px rgba(0, 0, 0, 0.06);
+}
+
+.addButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(175, 47, 47, 0.1);
+  color: #cc9a9a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  z-index: 1;
+  font-size: 24px;
+  line-height: 1;
+  font-family: monospace;
+}
+
+.addButton:hover {
+  background: rgba(175, 47, 47, 0.2);
+  color: #af5b5e;
+}
+
+.addButton.active {
+  background: rgba(175, 47, 47, 0.8);
+  color: white;
+}
+
+.addButton.active:hover {
+  background: rgba(175, 47, 47, 1);
+}
+
+.addButton:disabled {
+  background: rgba(0, 0, 0, 0.05);
+  color: #e6e6e6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .input {
+    font-size: 18px;
+    padding: 14px 54px 14px 14px;
+  }
+  
+  .addButton {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    right: 6px;
+  }
+}
+
+@media (max-width: 400px) {
+  .inputContainer {
+    border-radius: 8px;
+    margin: 0 0 35px 0;
+  }
+
+  .input {
+    padding: 14px 50px 14px 12px;
+    font-size: 16px;
+  }
+  
+  .addButton {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    right: 4px;
+  }
 }

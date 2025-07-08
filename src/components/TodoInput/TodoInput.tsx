@@ -1,10 +1,8 @@
-import React, {
-  useState,
-  KeyboardEvent,
-  useCallback,
-  useRef,
-  useEffect
-} from 'react';
+import React, { useState, KeyboardEvent, useCallback, useEffect } from 'react';
+import { TODO_CONFIG } from '../../configs/configs';
+import { useInputValidation } from '../../hooks/useInputValidation';
+import { useInputAnimation } from '../../hooks/useInputAnimation';
+import { useInputSubmit } from '../../hooks/useInputSubmit';
 import styles from './TodoInput.module.css';
 
 interface TodoInputProps {
@@ -13,105 +11,82 @@ interface TodoInputProps {
 
 export const TodoInput = React.memo<TodoInputProps>(({ onAddTodo }) => {
   const [value, setValue] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+
+  const { error, validateInput, validatePaste, handleInputChange, clearError } =
+    useInputValidation();
+
+  const { inputRef, triggerErrorAnimation, focusInput, blurInput } =
+    useInputAnimation();
+
+  const { isLoading, handleSubmit } = useInputSubmit({
+    onAddTodo,
+    validateInput,
+    triggerErrorAnimation
+  });
 
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
-
-  const handleSubmit = useCallback(async () => {
-    const trimmedValue = value.trim();
-
-    if (!trimmedValue) {
-      setError('Task cannot be empty');
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.style.animation = 'none';
-        setTimeout(() => {
-          if (inputRef.current) {
-            inputRef.current.style.animation = '';
-          }
-        }, 100);
-      }
-
-      return;
-    }
-
-    if (trimmedValue.length > 500) {
-      setError('Task is too long (max 500 characters)');
-
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      onAddTodo(trimmedValue);
-      setValue('');
-      setError('');
-    } catch (err) {
-      setError('Failed to add task. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [value, onAddTodo]);
+    focusInput();
+  }, [focusInput]);
 
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
+    async (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter' && !isLoading) {
         e.preventDefault();
-        handleSubmit();
+        const success = await handleSubmit(value);
+        if (success) {
+          setValue('');
+          clearError();
+        }
       }
       if (e.key === 'Escape') {
         setValue('');
-        setError('');
-        if (inputRef.current) {
-          inputRef.current.blur();
-        }
+        clearError();
+        blurInput();
       }
     },
-    [handleSubmit, isLoading]
+    [value, isLoading, handleSubmit, clearError, blurInput]
   );
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setValue(newValue);
-
-      if (error) {
-        setError('');
-      }
-
-      if (newValue.length > 450) {
-        setError(`${500 - newValue.length} characters remaining`);
-      }
+      handleInputChange(newValue);
     },
-    [error]
+    [handleInputChange]
   );
 
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       const pastedText = e.clipboardData.getData('text');
-      if (pastedText.length > 500) {
+      if (!validatePaste(pastedText)) {
         e.preventDefault();
-        setError('Pasted text is too long (max 500 characters)');
       }
     },
-    []
+    [validatePaste]
   );
+
+  const handleButtonClick = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (!isLoading) {
+        const success = await handleSubmit(value);
+        if (success) {
+          setValue('');
+          clearError();
+        }
+      }
+    },
+    [value, isLoading, handleSubmit, clearError]
+  );
+
+  const canSubmit = value.trim().length > 0 && !isLoading;
 
   return (
     <div className={`${styles.inputContainer} ${error ? styles.error : ''}`}>
       <input
         ref={inputRef}
-        className={`${styles.input} ${
-          error && !error.includes('remaining') ? styles.error : ''
-        }`}
+        className={styles.input}
         type="text"
         placeholder="What needs to be done?"
         value={value}
@@ -120,10 +95,26 @@ export const TodoInput = React.memo<TodoInputProps>(({ onAddTodo }) => {
         onPaste={handlePaste}
         disabled={isLoading}
         autoComplete="off"
-        maxLength={500}
+        maxLength={TODO_CONFIG.MAX_LENGTH}
         aria-label="Add new todo"
         aria-describedby={error ? 'error-message' : undefined}
       />
+
+      <button
+        type="button"
+        className={`${styles.addButton} ${canSubmit ? styles.active : ''}`}
+        onClick={handleButtonClick}
+        disabled={!canSubmit}
+        aria-label="Add task"
+      >
+        {isLoading ? (
+          <span className={styles.spinner} aria-hidden="true">
+            ⟳
+          </span>
+        ) : (
+          <span aria-hidden="true">+</span>
+        )}
+      </button>
 
       {error && (
         <div
@@ -136,10 +127,6 @@ export const TodoInput = React.memo<TodoInputProps>(({ onAddTodo }) => {
         >
           {error}
         </div>
-      )}
-
-      {isLoading && (
-        <div className={styles.loadingIndicator}>Adding task...</div>
       )}
 
       {!error && !isLoading && (
